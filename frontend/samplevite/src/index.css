@@ -1,6 +1,6 @@
-@import "tailwindcss";
-
-/* Remove the old @tailwind directives and replace with @import */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Your custom CSS variables (optional) */
 :root {

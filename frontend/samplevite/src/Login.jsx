@@ -19,9 +19,14 @@ function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
       <div className="w-full max-w-md">
-        <h1 className="mb-8 text-center text-5xl font-bold text-purple-400">
-          LOCKDOWN
-        </h1>
+        <div className="mb-8 flex flex-col items-center">
+          <div className="text-4xl text-purple-600 font-google self-start">
+            CYBER
+          </div>
+          <h1 className="m-0 text-8xl font-bold tracking-[0.1em] bg-gradient-to-t from-purple-400 to-purple-700 bg-clip-text text-transparent font-google">
+            Lockdown
+          </h1>
+        </div>
         
         <form onSubmit={handleSubmit} className="rounded-2xl bg-gray-800 p-8 shadow-2xl ring-1 ring-gray-700">
           <h2 className="mb-8 text-center text-3xl font-bold text-white">Login</h2>
