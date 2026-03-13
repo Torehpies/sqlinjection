@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
+
 function Login() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		setLoading(true);
@@ -38,13 +41,11 @@ function Login() {
 		setLoading(false);
 	};
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
+		<div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-900 from-30% to-red-900 to-70% p-4">
 			<div className="w-full max-w-md">
 				<div className="mb-8 flex flex-col items-center">
-					<div className="text-4xl text-purple-600 font-google self-start">
-						CYBER
-					</div>
-					<h1 className="m-0 text-8xl font-bold tracking-[0.1em] bg-gradient-to-t from-purple-400 to-purple-700 bg-clip-text text-transparent font-google">
+					<div className="ml-3 text-4xl text-red-600 font-google self-start">CYBER</div>
+					<h1 className="m-0 text-8xl font-bold tracking-[6px] bg-gradient-to-t from-red-400 to-red-700 bg-clip-text text-transparent font-google">
 						Lockdown
 					</h1>
 				</div>
@@ -58,24 +59,34 @@ function Login() {
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
 								required
-								className="w-full rounded-lg border-2 border-gray-600 bg-gray-900 p-3 text-white transition-colors focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/20"
+								className="w-full rounded-lg border-2 border-gray-600 bg-gray-900 p-3 text-white transition-colors focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-400/20"
 							/>
 						</div>
 						<div>
 							<label className="mb-2 block text-sm font-medium text-gray-300">Password:</label>
-							<input
-								type="password"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								required
-								className="w-full rounded-lg border-2 border-gray-600 bg-gray-900 p-3 text-white transition-colors focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/20"
-							/>
+							<div className="relative">
+								<input
+									type={showPassword ? "text" : "password"}
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+									required
+									className="w-full rounded-lg border-2 border-gray-600 bg-gray-900 p-3 pr-12 text-white transition-colors focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-400/20"
+								/>
+								<button
+									type="button"
+									onClick={() => setShowPassword((v) => !v)}
+									className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-red-400"
+									aria-label={showPassword ? "Hide password" : "Show password"}
+								>
+									{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+								</button>
+							</div>
 						</div>
 					</div>
 					<button
 						type="submit"
 						disabled={loading}
-						className="mt-8 w-full rounded-lg bg-purple-600 py-3 font-semibold text-white transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+						className="mt-8 w-full rounded-lg bg-red-600 py-3 font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
 					>
 						{loading ? "Logging in..." : "Login"}
 					</button>
