@@ -4,7 +4,6 @@ function Login() {
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
-	const [user, setUser] = useState(null);
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		setLoading(true);
@@ -21,7 +20,6 @@ function Login() {
 			);
 			const data = await res.json();
 			if (data.success) {
-				setUser(data.user);
 				// store role and user info in localStorage
 				localStorage.setItem("role", data.user.role);
 				localStorage.setItem("user", JSON.stringify(data.user));
@@ -34,6 +32,7 @@ function Login() {
 			} else {
 				setError(data.message || "Login failed");
 			}
+
 		} catch (err) {
 			setError("Network or server error.");
 		}
@@ -83,12 +82,6 @@ function Login() {
 					</button>
 					{error && <div className="text-red-500 mt-5">{error}</div>}
 				</form>
-				{user && (
-					<div className="mt-8 bg-gray-800 p-6 rounded-xl text-green-400">
-						<div>Login Success! User info:</div>
-						<pre className="mt-4 text-green-200">{JSON.stringify(user, null, 2)}</pre>
-					</div>
-				)}
 			</div>
 		</div>
 	);
