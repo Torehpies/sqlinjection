@@ -1,11 +1,10 @@
-const express = require('express');
-const router = express.Router();
-const connection = require('../db');
+import { Router } from 'express';
+const router = Router();
+import { query as _query } from '../db';
 router.post('/', (req, res) => {
 	const { username, password } = req.body;
-	// SQL injection vulnerability here:
 	const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
-	connection.query(query, (err, results) => {
+	_query(query, (err, results) => {
 		if (err) {
 			return res.status(500).json({ error: 'Database error', details: err });
 		}
@@ -16,4 +15,4 @@ router.post('/', (req, res) => {
 		}
 	});
 });
-module.exports = router;
+export default router;
