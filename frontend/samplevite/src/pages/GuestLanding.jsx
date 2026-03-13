@@ -1,0 +1,86 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+function GuestLanding() {
+    const navigate = useNavigate();
+    const [commentInput, setCommentInput] = useState("");
+    const [comments, setComments] = useState([]);
+    const [nextGuestId, setNextGuestId] = useState(2026000);
+
+    const handleLogout = () => {
+        navigate("/");
+    };
+
+    const handleAddComment = (e) => {
+        e.preventDefault();
+        const trimmed = commentInput.trim();
+        if (!trimmed) return;
+
+        const newComment = {
+            username: String(nextGuestId),
+            message: trimmed,
+        };
+
+        setComments((prev) => [newComment, ...prev]);
+        setNextGuestId((prev) => prev + 1);
+        setCommentInput("");
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-900 p-8 text-white">
+            <header className="mb-8 flex items-center justify-between">
+                <h1 className="text-4xl font-bold">Guest Area</h1>
+                <button
+                    onClick={handleLogout}
+                    className="rounded-lg bg-red-600 px-6 py-2 font-medium text-white transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                    Back to Login
+                </button>
+            </header>
+
+            <div className="mx-auto w-full max-w-2xl rounded-2xl bg-gray-800 p-6 ring-1 ring-gray-700">
+                <form onSubmit={handleAddComment} className="mb-6 space-y-3">
+                    <label className="block text-sm font-medium text-gray-300">
+                        Write a comment
+                    </label>
+                    <input
+                        type="text"
+                        value={commentInput}
+                        onChange={(e) => setCommentInput(e.target.value)}
+                        placeholder="Type your comment..."
+                        className="w-full rounded-lg border-2 border-gray-600 bg-gray-900 p-3 text-white transition-colors focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-400/20"
+                    />
+                    <button
+                        type="submit"
+                        className="rounded-lg bg-red-600 px-5 py-2 font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    >
+                        Post Comment
+                    </button>
+                </form>
+
+                <div>
+                    <h2 className="mb-3 text-xl font-semibold">Comments</h2>
+                    {comments.length === 0 ? (
+                        <p className="text-gray-400">No comments yet.</p>
+                    ) : (
+                        <ul className="space-y-3">
+                            {comments.map((comment, index) => (
+                                <li
+                                    key={`${comment.username}-${index}`}
+                                    className="rounded-lg bg-gray-900 p-3 ring-1 ring-gray-700 text-left"
+                                >
+                                    <p className="mb-1 text-sm font-semibold text-red-400">
+                                        User {comment.username}
+                                    </p>
+                                    <p className="text-white">{comment.message}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default GuestLanding;

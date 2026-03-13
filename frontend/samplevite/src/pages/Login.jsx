@@ -5,55 +5,61 @@ import { useAuth } from '../hooks/useAuth';
 
 
 function Login() {
-  const { user, role, login } = useAuth();
-  const navigate = useNavigate();
+	const { user, role, login } = useAuth();
+	const navigate = useNavigate();
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 
-  // Redirect away from login if already logged in
-  useEffect(() => {
-    if (user && role === "admin") {
-      navigate("/admin", { replace: true });
-    } else if (user && role === "user") {
-      navigate("/user", { replace: true });
-    }
-  }, [user, role, navigate]);
+	// Redirect away from login if already logged in
+	useEffect(() => {
+		if (user && role === "admin") {
+			navigate("/admin", { replace: true });
+		} else if (user && role === "user") {
+			navigate("/user", { replace: true });
+		}
+	}, [user, role, navigate]);
 
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		setLoading(true);
 		setError("");
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
-        }
-      );
-      const data = await res.json();
-      if (data.success) {
-        // store role and user info using AuthContext
-        login(data.user);
-        // redirect based on role
-        if (data.user.role === "admin") {
-          navigate("/admin", { replace: true });
-        } else {
-          navigate("/user", { replace: true });
-        }
-      } else {
-        setError(data.message || "Login failed");
-      }
-    } catch (error) {
-      console.error(error);
-      setError("Network or server error.");
-    }
-    setLoading(false);
-  };
+		try {
+			const res = await fetch(
+				`${import.meta.env.VITE_BACKEND_URL}/login`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ username, password }),
+				}
+			);
+			const data = await res.json();
+			if (data.success) {
+				// store role and user info using AuthContext
+				login(data.user);
+				// redirect based on role
+				if (data.user.role === "admin") {
+					navigate("/admin", { replace: true });
+				} else {
+					navigate("/user", { replace: true });
+				}
+			} else {
+				setError(data.message || "Login failed");
+			}
+		} catch (error) {
+			console.error(error);
+			setError("Network or server error.");
+		}
+		setLoading(false);
+	};
+
+	const { logout } = useAuth();
+	const handleGuestContinue = () => {
+		logout();
+		navigate("/guest", { replace: true });
+	};
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-900 from-30% to-red-900 to-70% p-4">
 			<div className="w-full max-w-md">
@@ -106,6 +112,13 @@ function Login() {
 					</button>
 					{error && <div className="text-red-500 mt-5">{error}</div>}
 				</form>
+				<button
+					type="button"
+					onClick={handleGuestContinue}
+					className="mt-8 w-full rounded-lg border border-gray-500 bg-gray-300 py-3 font-semibold text-black transition-colors hover:bg-gray-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-400"
+				>
+					Continue as Guest
+				</button>
 			</div>
 		</div>
 	);
