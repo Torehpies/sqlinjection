@@ -4,7 +4,9 @@ function UserLanding() {
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    navigate('/')
+    localStorage.removeItem('role');
+    localStorage.removeItem('user');
+    navigate('/');
   }
 
   return (

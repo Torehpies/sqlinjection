@@ -9,8 +9,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/admin" element={<AdminLanding />} />
-        <Route path="/user" element={<UserLanding />} />
+         <Route path="/admin" element={localStorage.getItem('role') === 'admin' ? <AdminLanding /> : <Login />} />
+         <Route path="/user" element={localStorage.getItem('role') === 'user' ? <UserLanding /> : <Login />} />
       </Routes>
     </Router>
   )

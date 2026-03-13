@@ -22,6 +22,15 @@ function Login() {
 			const data = await res.json();
 			if (data.success) {
 				setUser(data.user);
+				// store role and user info in localStorage
+				localStorage.setItem("role", data.user.role);
+				localStorage.setItem("user", JSON.stringify(data.user));
+				// redirect based on role
+				if (data.user.role === "admin") {
+					window.location.href = "/admin";
+				} else {
+					window.location.href = "/user";
+				}
 			} else {
 				setError(data.message || "Login failed");
 			}
