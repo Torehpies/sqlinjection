@@ -3,12 +3,10 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
 const app = express();
+const origins = process.env.CORS_ORIGINS.split(',');
 app.use(cors({
-	origin: [
-		'http://localhost:5173',
-		'https://cyberlockdown.netlify.app/'
-	],
-	methods: ['GET', 'POST'],
+	origin: origins,
+	methods: ['GET', 'POST', 'OPTIONS'],
 }));
 app.use(json());
 import authRoutes from './routes/auth.js';
