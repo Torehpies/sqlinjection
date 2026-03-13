@@ -1,45 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
+import { useAuth } from './useAuth';
+
 
 function Login() {
+  const { user, role, login } = useAuth();
+  const navigate = useNavigate();
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
+
+  // Redirect away from login if already logged in
+  useEffect(() => {
+    if (user && role === "admin") {
+      navigate("/admin", { replace: true });
+    } else if (user && role === "user") {
+      navigate("/user", { replace: true });
+    }
+  }, [user, role, navigate]);
+
 	const handleLogin = async (e) => {
 		e.preventDefault();
 		setLoading(true);
 		setError("");
-		try {
-			const res = await fetch(
-				`${import.meta.env.VITE_BACKEND_URL}/login`,
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ username, password }),
-				}
-			);
-			const data = await res.json();
-			if (data.success) {
-				// store role and user info in localStorage
-				localStorage.setItem("role", data.user.role);
-				localStorage.setItem("user", JSON.stringify(data.user));
-				// redirect based on role
-				if (data.user.role === "admin") {
-					window.location.href = "/admin";
-				} else {
-					window.location.href = "/user";
-				}
-			} else {
-				setError(data.message || "Login failed");
-			}
-
-		} catch (err) {
-			setError("Network or server error.");
-		}
-		setLoading(false);
-	};
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        // store role and user info using AuthContext
+        login(data.user);
+        // redirect based on role
+        if (data.user.role === "admin") {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/user", { replace: true });
+        }
+      } else {
+        setError(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error(error);
+      setError("Network or server error.");
+    }
+    setLoading(false);
+  };
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-900 from-30% to-red-900 to-70% p-4">
 			<div className="w-full max-w-md">
