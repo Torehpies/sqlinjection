@@ -1,6 +1,7 @@
 import express, { json } from 'express';
 import cors from 'cors';
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 const app = express();
 app.use(cors({
 	origin: [
