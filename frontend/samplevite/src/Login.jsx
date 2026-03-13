@@ -8,7 +8,6 @@ function Login() {
 		e.preventDefault();
 		setLoading(true);
 		setError("");
-		setUser(null);
 		try {
 			const res = await fetch(
 				`${import.meta.env.VITE_BACKEND_URL}/login`,
