@@ -40,6 +40,11 @@ function Login() {
 		}
 		setLoading(false);
 	};
+	const handleGuestContinue = () => {
+		localStorage.removeItem("role");
+		localStorage.removeItem("user");
+		window.location.href = "/guest";
+	};
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-900 from-30% to-red-900 to-70% p-4">
 			<div className="w-full max-w-md">
@@ -92,6 +97,13 @@ function Login() {
 					</button>
 					{error && <div className="text-red-500 mt-5">{error}</div>}
 				</form>
+				<button
+					type="button"
+					onClick={handleGuestContinue}
+					className="mt-8 w-full rounded-lg border border-gray-500 bg-gray-300 py-3 font-semibold text-black transition-colors hover:bg-gray-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-400"
+				>
+					Continue as Guest
+				</button>
 			</div>
 		</div>
 	);
