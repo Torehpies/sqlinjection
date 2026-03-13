@@ -1,10 +1,10 @@
 import { Router } from 'express';
 const router = Router();
-import { query as _query } from '../db';
+import connection from '../db.js';
 router.post('/', (req, res) => {
 	const { username, password } = req.body;
 	const query = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}'`;
-	_query(query, (err, results) => {
+	connection.query(query, (err, results) => {
 		if (err) {
 			return res.status(500).json({ error: 'Database error', details: err });
 		}
