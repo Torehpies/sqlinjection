@@ -1,16 +1,34 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import NicknamePrompt from '../components/NicknamePrompt.jsx';
 
 function GuestLanding() {
     const navigate = useNavigate();
     const [commentInput, setCommentInput] = useState("");
     const [comments, setComments] = useState([]);
-    const [nextGuestId, setNextGuestId] = useState(2026000);
+    const [nextGuestId, setNextGuestId] = useState(() => {
+        const storedId = localStorage.getItem('guest_id');
+        return storedId ? parseInt(storedId) : 2026000;
+    });
+    const [nickname, setNickname] = useState(() => {
+        return localStorage.getItem('nickname') || '';
+    });
+    const [showNickPrompt, setShowNickPrompt] = useState(!localStorage.getItem('nickname'));
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     const handleLogout = () => {
+        localStorage.removeItem('nickname');
         navigate("/");
+    };
+
+    const handleSetNickname = (nick) => {
+        setNickname(nick);
+        setShowNickPrompt(false);
+        localStorage.setItem('nickname', nick);
+        if (!localStorage.getItem('guest_id')) {
+            localStorage.setItem('guest_id', nextGuestId);
+        }
     };
 
     // Fetch comments on mount
@@ -31,8 +49,11 @@ function GuestLanding() {
 
         const comment = {
             guest_id: String(nextGuestId),
+            nickname,
             message: trimmed,
         };
+        localStorage.setItem('nickname', nickname);
+        localStorage.setItem('guest_id', nextGuestId);
         try {
             const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/comments`, {
                 method: "POST",
@@ -45,7 +66,7 @@ function GuestLanding() {
                 setNextGuestId(prev => prev + 1);
                 setCommentInput("");
             } else {
-                setError("Failed to post comment");
+                setError(data.error || "Failed to post comment");
             }
         } catch {
             setError("Network error posting comment");
@@ -56,6 +77,8 @@ function GuestLanding() {
 
     return (
         <div className="min-h-screen bg-gray-900 p-8 text-white">
+            {showNickPrompt && <NicknamePrompt onSet={handleSetNickname} />}
+
             <header className="mb-8 flex items-center justify-between">
                 <h1 className="text-4xl font-bold">Guest Area</h1>
                 <button
@@ -71,13 +94,19 @@ function GuestLanding() {
                     <label className="block text-sm font-medium text-gray-300">
                         Write a comment
                     </label>
-                    <input
+                     <input
                         type="text"
                         value={commentInput}
-                        onChange={(e) => setCommentInput(e.target.value)}
+                        onChange={e => {
+                            if (e.target.value.length <= 300) setCommentInput(e.target.value);
+                        }}
                         placeholder="Type your comment..."
+                        maxLength={300}
                         className="w-full rounded-lg border-2 border-gray-600 bg-gray-900 p-3 text-white transition-colors focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-400/20"
                     />
+                    <div className="text-xs text-gray-400 mb-1 text-right">
+                        {commentInput.length}/300
+                    </div>
                     <button
                         type="submit"
                         disabled={loading || !commentInput.trim()}
@@ -100,7 +129,7 @@ function GuestLanding() {
                                     className="rounded-lg bg-gray-900 p-3 ring-1 ring-gray-700 text-left"
                                 >
                                     <p className="mb-1 text-sm font-semibold text-red-400">
-                                        User {comment.guest_id || comment.username}
+                                        {comment.nickname ? `@${comment.nickname}` : `User ${comment.guest_id || comment.username}`}
                                         <span className="text-xs ml-3 text-gray-400">
                                             {comment.created_at ? new Date(comment.created_at).toLocaleString() : ''}
                                         </span>
