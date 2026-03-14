@@ -10,6 +10,8 @@ app.use(cors({
 }));
 app.use(json());
 import authRoutes from './routes/auth.js';
+import commentsRoutes from './routes/comments.js';
 app.use('/login', authRoutes);
+app.use('/comments', commentsRoutes);
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

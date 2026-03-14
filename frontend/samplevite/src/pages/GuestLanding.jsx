@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function GuestLanding() {
@@ -6,24 +6,52 @@ function GuestLanding() {
     const [commentInput, setCommentInput] = useState("");
     const [comments, setComments] = useState([]);
     const [nextGuestId, setNextGuestId] = useState(2026000);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const handleLogout = () => {
         navigate("/");
     };
 
-    const handleAddComment = (e) => {
+    // Fetch comments on mount
+    useEffect(() => {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/comments`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) setComments(data.comments);
+            })
+            .catch(() => setError("Could not load comments"));
+    }, []);
+
+    const handleAddComment = async (e) => {
         e.preventDefault();
         const trimmed = commentInput.trim();
         if (!trimmed) return;
+        setLoading(true);
 
-        const newComment = {
-            username: String(nextGuestId),
+        const comment = {
+            guest_id: String(nextGuestId),
             message: trimmed,
         };
-
-        setComments((prev) => [newComment, ...prev]);
-        setNextGuestId((prev) => prev + 1);
-        setCommentInput("");
+        try {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/comments`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(comment),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setComments(prev => [data.comment, ...prev]);
+                setNextGuestId(prev => prev + 1);
+                setCommentInput("");
+            } else {
+                setError("Failed to post comment");
+            }
+        } catch {
+            setError("Network error posting comment");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -52,10 +80,12 @@ function GuestLanding() {
                     />
                     <button
                         type="submit"
-                        className="rounded-lg bg-red-600 px-5 py-2 font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                        disabled={loading || !commentInput.trim()}
+                        className="rounded-lg bg-red-600 px-5 py-2 font-semibold text-white transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
                     >
-                        Post Comment
+                        {loading ? 'Posting...' : 'Post Comment'}
                     </button>
+                    {error && <div className="text-red-400 mt-2">{error}</div>}
                 </form>
 
                 <div>
@@ -66,11 +96,14 @@ function GuestLanding() {
                         <ul className="space-y-3">
                             {comments.map((comment, index) => (
                                 <li
-                                    key={`${comment.username}-${index}`}
+                                    key={comment.id || `${comment.guest_id || comment.username}-${index}`}
                                     className="rounded-lg bg-gray-900 p-3 ring-1 ring-gray-700 text-left"
                                 >
                                     <p className="mb-1 text-sm font-semibold text-red-400">
-                                        User {comment.username}
+                                        User {comment.guest_id || comment.username}
+                                        <span className="text-xs ml-3 text-gray-400">
+                                            {comment.created_at ? new Date(comment.created_at).toLocaleString() : ''}
+                                        </span>
                                     </p>
                                     <p className="text-white">{comment.message}</p>
                                 </li>
